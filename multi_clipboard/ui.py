@@ -55,7 +55,7 @@ class ClipboardSelector(QtWidgets.QWidget):
             rows = 1
             cols = clipboards_total + 1
         else:
-            rows = int(clipboards_total / 6) + 1
+            rows = clipboards_total // 6 + 1
             cols = 6
         self.setFixedSize(
             ((CLIPBOARD_LABEL_SIZE + GRID_SPACING) * cols) + GRID_SPACING,

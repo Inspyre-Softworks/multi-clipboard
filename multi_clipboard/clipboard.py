@@ -57,14 +57,13 @@ def get_clipboard_preview():
     clipboard_type = get_clipboard_type()
     preview_type = CF_PREVIEW_RELATIONS[clipboard_type]
     if preview_type == 0:
-        if clipboard_type == CF_IMAGES:
-            # If the clipboard type is an image, get the bytes using Pillow in JPEG format
-            img = ImageGrab.grabclipboard()
-            data = io.BytesIO()
-            img.save(data, format='JPEG')
-            return data.getvalue()
-        else:
+        if clipboard_type != CF_IMAGES:
             return ''
+        # If the clipboard type is an image, get the bytes using Pillow in JPEG format
+        img = ImageGrab.grabclipboard()
+        data = io.BytesIO()
+        img.save(data, format='JPEG')
+        return data.getvalue()
     # Attempt to get preview
     win32clipboard.OpenClipboard()
     try:

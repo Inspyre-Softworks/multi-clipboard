@@ -11,11 +11,10 @@ def check_clear_arg(value):
     """ Make sure the value passed in with the -c flag is either an integer or star (*) """
     if value == '*':
         return '*'
-    else:
-        try:
-            return int(value)
-        except ValueError:
-            raise argparse.ArgumentTypeError("%s is not an integer or '*'" % value)
+    try:
+        return int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError("%s is not an integer or '*'" % value)
 
 
 def delete_stored_clipboards(db_manager, clipboard_ids):
@@ -70,8 +69,7 @@ def create_shortcut(parent=None):
     )
     if filename != '':
         project_directory = str(Path(__file__).parent.parent)
-        f = open(filename, 'w')
-        f.write('Set oShell = WScript.CreateObject ("WScript.Shell")\n')
-        f.write('oShell.CurrentDirectory = "' + project_directory + '"\n')
-        f.write('oShell.run "' + sys.executable + ' -m multi_clipboard", 0, True\n')
-        f.close()
+        with open(filename, 'w') as f:
+            f.write('Set oShell = WScript.CreateObject ("WScript.Shell")\n')
+            f.write('oShell.CurrentDirectory = "' + project_directory + '"\n')
+            f.write('oShell.run "' + sys.executable + ' -m multi_clipboard", 0, True\n')
