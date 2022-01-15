@@ -34,9 +34,8 @@ def start_listener():
 
 def stop_listener():
     """ Tell the current running server to stop, must check is_listener_running() before calling """
-    f = open(SERVER_LOCK_FILE, 'r')
-    port = int(f.readline())
-    f.close()
+    with open(SERVER_LOCK_FILE, 'r') as f:
+        port = int(f.readline())
     server = ('127.0.0.1', port)
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -48,9 +47,8 @@ def is_listener_running():
     if os.path.isfile(SERVER_LOCK_FILE):
         # If file exists, get the port
         try:
-            f = open(SERVER_LOCK_FILE, 'r')
-            port = int(f.readline())
-            f.close()
+            with open(SERVER_LOCK_FILE, 'r') as f:
+                port = int(f.readline())
             server = ('127.0.0.1', port)
         except PermissionError:
             return False
@@ -73,10 +71,9 @@ def is_listener_running():
 
 def setup_listener_auto_start():
     """ Creates startup file with the correct command """
-    f = open(STARTUP_FILE, 'w')
-    f.write('Set oShell = WScript.CreateObject ("WScript.Shell")\n')
-    f.write('oShell.run "' + STARTUP_COMMAND + '", 0, True')
-    f.close()
+    with open(STARTUP_FILE, 'w') as f:
+        f.write('Set oShell = WScript.CreateObject ("WScript.Shell")\n')
+        f.write('oShell.run "' + STARTUP_COMMAND + '", 0, True')
 
 
 def remove_listener_auto_start():
@@ -109,10 +106,8 @@ class ListenerThread(threading.Thread):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         server_socket.bind(('127.0.0.1', 0))
 
-        f = open(SERVER_LOCK_FILE, 'w')
-        f.write(str(server_socket.getsockname()[1]))
-        f.close()
-
+        with open(SERVER_LOCK_FILE, 'w') as f:
+            f.write(str(server_socket.getsockname()[1]))
         while True:
             message, address = server_socket.recvfrom(1024)
             if message == SERVER_ARE_YOU_RUNNING:
@@ -135,7 +130,7 @@ class ListenerThread(threading.Thread):
         """ When a key is pressed, check if it completes the combination of key presses """
         if key in LISTENER_COMBINATION:
             self.keys_pressed.add(key)
-            if all([key in self.keys_pressed for key in LISTENER_COMBINATION]):
+            if all(key in self.keys_pressed for key in LISTENER_COMBINATION):
                 # Make sure there isn't already a GUI_Thread running
                 for thread in threading.enumerate():
                     if thread.getName() == 'GUI_Thread' and thread.is_alive():
@@ -151,6 +146,5 @@ class ListenerThread(threading.Thread):
             self.keys_pressed.remove(key)
 
 
-if __name__ == "__main__":
-    if not is_listener_running():
-        start_listener()
+if __name__ == "__main__" and not is_listener_running():
+    start_listener()
